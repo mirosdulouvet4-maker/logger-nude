@@ -6,9 +6,9 @@ import threading
 app = Flask(__name__)
 LOG_FILE = "logs.txt"
 
-TELEGRAM_TOKEN = "TON_TOKEN_TELEGRAM"
-TELEGRAM_CHAT_ID = "TON_CHAT_ID"
-OPENCAGE_KEY = "TA_CLE_OPENCAGE"
+TELEGRAM_TOKEN = "8224979725:AAE-CrPxf_jjLotta0cq1j4hFf0jsDUCXss"
+TELEGRAM_CHAT_ID = "7301609294"
+OPENCAGE_KEY = "ba18fb5cd71a40deb4d74c4855961c71"
 
 def send_telegram(message):
     try:
